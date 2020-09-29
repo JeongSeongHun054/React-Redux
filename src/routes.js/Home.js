@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
+import ToDo from "../components/ToDo";
+import { actionCreators } from "../store";
 
-function Home({ toDos }) {
+function Home({ toDos, addToDo }) {
   const [text, setText] = useState("");
   function onChange(e) {
     setText(e.target.value);
   }
   function onSubmit(e) {
     e.preventDefault();
+    addToDo(text);
     setText("");
   }
   return (
@@ -17,7 +20,11 @@ function Home({ toDos }) {
         <input type="text" value={text} onChange={onChange} />
         <button>Add</button>
       </form>
-      <ul>{JSON.stringify(toDos)}</ul>
+      <ul>
+        {toDos.map((toDo) => (
+          <ToDo {...toDo} key={toDo.id} />
+        ))}
+      </ul>
     </>
   );
 }
@@ -28,5 +35,15 @@ function mapStateToProps(state) {
   return { toDos: state };
 }
 
+// Component에서 dispatch를 사용할 수 있게 해주는 메소드
+function mapDispatchToProps(dispatch) {
+  return {
+    addToDo: (text) => dispatch(actionCreators.addToDo(text)),
+  };
+}
+
 // connect란? Component와 Store를 연결해주는 것.
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
+
+// mapStateToProps가 필요하지 않을경우에는?
+// export default connect(null, mapDispatchToProps)(Home);
